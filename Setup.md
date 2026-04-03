@@ -1,149 +1,174 @@
-# Cocos Agent Team — Setup & Launch Guide
+# Cocos Playable Ad Agent Team — Setup & Launch Guide
 
 ## Overview
 
-This is a **multi-agent tmux team** for autonomous Cocos game development. Each agent has a dedicated role with specialized skills and tools. They communicate via a shared task board and file system.
+A **multi-agent tmux team** for autonomous playable ad development. Each agent owns a specialized domain — from gameplay hook design to SDK integration to compliance. They coordinate via a shared filesystem task board and team chat.
 
 ```
 cocos-agent-team/
 ├── agents/
-│   ├── roles/
-│   │   ├── cocos-dev.sh          # 🏗️ Cocos Game Dev — builds game features
-│   │   ├── tool-dev.sh           # 🔧 Tool Dev — builds and maintains tooling
-│   │   └── quality-dev.sh        # 🎮 Quality Dev — playtests & polishes
-│   ├── shared.sh                 # Shared prompt/utility loader
-│   └── role-base.sh             # Base system prompt for all roles
+│   ├── role-base.sh              # Shared helpers (colors, paths, board utils)
+│   ├── shared.sh                 # Task parsing, agent messaging
+│   └── roles/
+│       ├── creative-dev.sh        # 🎯 Hook design, core loop, gameplay mechanics
+│       ├── platform-dev.sh        # 🔗 SDK integration, WebGL, build export
+│       ├── asset-dev.sh           # 🎨 Art, UI, VFX, end cards
+│       ├── adops-dev.sh           # 📊 Tracking, CI/CD, backend scripts
+│       └── qa-dev.sh             # ✅ Playtest, perf, compliance testing
 ├── configs/
-│   ├── task-board.md            # Shared task board (markdown)
-│   ├── project-context.md        # Current project state snapshot
-│   └── team-chat.md             # Inter-agent communication log
-├── tmux/
-│   ├── session.sh               # Launches full tmux session with all agents
-│   ├── layout.conf              # Tmux window/pane layout definition
-│   └── attach.sh                # Attach to running session
+│   ├── task-board.md             # Shared task board
+│   ├── project-context.md         # Ad campaign configuration
+│   └── team-chat.md              # Inter-agent communication log
 ├── prompts/
-│   ├── cocos-dev-system.md      # System prompt for cocos-dev
-│   ├── tool-dev-system.md       # System prompt for tool-dev
-│   └── quality-dev-system.md    # System prompt for quality-dev
-└── README.md                    # This file
+│   ├── creative-dev-system.md     # 🎯 creative-dev skills + workflow
+│   ├── platform-dev-system.md    # 🔗 platform-dev skills + workflow
+│   ├── asset-dev-system.md        # 🎨 asset-dev skills + workflow
+│   ├── adops-dev-system.md        # 📊 adops-dev skills + workflow
+│   └── qa-dev-system.md           # ✅ qa-dev skills + workflow
+├── tmux/
+│   ├── session.sh                # Launch full tmux session
+│   ├── layout.conf               # Tmux window/pane styling
+│   └── attach.sh                 # Attach to running session
+└── README.md
 ```
+
+---
+
+## The 5 Roles
+
+### 🎯 creative-dev — Playable Ad Creative Designer
+
+**Mission:** Design the hook, core loop, pacing, CTA, and gameplay mechanics that make the ad compelling and conversion-focused.
+
+**Skills:**
+- Playable ad psychology (AARRR funnel, hook model)
+- Rapid onboarding loop design (first 5 seconds)
+- Core mechanic prototyping in Cocos
+- CTA placement and end-card flow
+- Conversion event design (install, signup, purchase)
+- Game feel: juicy feedback, micro-rewards, dopamine hits
+- Mobile UX: tap/swipe/drag interactions
+
+**Task Tags:** `#creative` `#gameplay-design` `#hook` `#core-loop` `#cta`
+
+---
+
+### 🔗 platform-dev — SDK Integration & Build Engineer
+
+**Mission:** Integrate ad platform SDKs (Google Play Games, AppLovin, Meta, Unity Ads), handle WebGL export, platform-specific build quirks, and device compatibility.
+
+**Skills:**
+- Ad SDK integration: Google Play Install Referrer, AppLovin MAX, Meta Audience Network, Unity Ads, ironSource
+- WebGL 2.0 / WebGL 1.0 compatibility
+- Cocos Creator build pipeline (`cocos build`, `--no-compile`)
+- Cross-platform JS bridging (native ↔ JS)
+- Minification, code splitting, bundle size optimization
+- Device compatibility matrix (Android, iOS, Huawei)
+- Memory budget enforcement (<5MB initial load)
+
+**Task Tags:** `#platform` `#sdk` `#integration` `#webgl` `#build`
+
+---
+
+### 🎨 asset-dev — Visual Artist & UI Designer
+
+**Mission:** Produce all visual assets — hero art, icons, UI elements, VFX, end cards, and brand-consistent graphics that drive click-through and install rates.
+
+**Skills:**
+- Vector illustration (SVG → PNG export)
+- Sprite sheet and atlas creation (TexturePacker CLI)
+- Lottie / DOTween animation for UI micro-interactions
+- End card design (store screenshot, CTA button, logo)
+- Iconography (material icons, custom game icons)
+- VFX: particle systems, screen flashes, pop-in animations
+- Font subsetting for bundle size
+- Image optimization (WebP, PNG-8 with alpha, tinypng)
+- Dark/light theme asset variants
+
+**Task Tags:** `#asset` `#ui-design` `#vfx` `#animation` `#end-card` `#icons`
+
+---
+
+### 📊 adops-dev — Tracking, Analytics & CI/CD Engineer
+
+**Mission:** Implement tracking events, analytics pipelines, CI/CD automation, backend scripts for server-side events, and build delivery workflows.
+
+**Skills:**
+- Tracking implementation: AppsFlyer, Adjust, Branch, Firebase Analytics
+- Server-side postback scripts (Node.js, Python)
+- Google Tag Manager / dataLayer events
+- GitHub Actions CI/CD (build → upload → notify)
+- S3 / Google Cloud Storage upload pipelines
+- Build versioning and changelog automation
+- CSV/JSON report generation from analytics data
+- Playable ad delivery APIs (doubleVerify, IAS brand safety)
+- A/B test event schema design
+- Docker build environments for reproducible builds
+
+**Task Tags:** `#tracking` `#analytics` `#ci` `#backend` `#postback` `#ab-test`
+
+---
+
+### ✅ qa-dev — Quality Assurance & Compliance Engineer
+
+**Mission:** Playtest the playable ad, profile performance, validate tracking, test across devices/browsers, and ensure compliance with ad platform policies.
+
+**Skills:**
+- Playable ad playtesting: hook retention, CTA conversion, play duration
+- Performance profiling: FPS, memory, load time, WebGL stats
+- Device matrix testing (Android 8–14, iOS 14–17, Chrome/Safari/Firefox)
+- Ad policy compliance: Google AWV policy, Meta creative guidelines
+- Tracking verification: AppsFlyer SDK debug mode, Charles Proxy
+- Accessibility review: tap targets ≥ 44px, contrast ≥ 4.5:1
+- Crash reporting integration (Firebase Crashlytics)
+- Pre-launch QA checklist sign-off
+- Regression testing after SDK / asset updates
+- Competitive creative audit (benchmark against top playable ads)
+
+**Task Tags:** `#qa` `#perf` `#test` `#compliance` `#playtest` `#device-test`
 
 ---
 
 ## Quick Start
 
-### Prerequisites
-
-```bash
-# Required tools
-which claude          # Claude CLI installed
-which tmux            # Terminal multiplexer
-which node || which bun  # For running dev servers
-
-# Optional: Claude Code settings
-ls ~/.claude/settings.json   # Global Claude Code config (optional)
-```
-
-### Step 1 — Configure Project Context
-
-Before launching, edit `configs/project-context.md` to describe your game project:
+### 1. Configure the campaign
 
 ```bash
 vim configs/project-context.md
 ```
 
-Minimum needed:
-- **Project name** and engine version (Cocos Creator 3.x / 2.x)
-- **Game type** (puzzle, RPG, arcade, etc.)
-- **Entry file** (`assets/scene.fire`, `main.js`, etc.)
-- **Build target** (Web / Native / Mobile)
+Fill in: game name, brand guidelines, CTA copy, target platforms, tracking IDs, bundle size budget.
 
-### Step 2 — Launch the Team
+### 2. Add tasks
+
+```bash
+vim configs/task-board.md
+```
+
+Tasks use this format:
+```markdown
+- [ ] AD-001: [creative] Design 5-second hook with swipe mechanic #creative @creative-dev @unassigned
+```
+
+### 3. Launch the team
 
 ```bash
 cd ~/cocos-agent-team
-
-# Option A: Launch full session (3 agents + task board)
 ./tmux/session.sh
-
-# Option B: Launch individual agents manually
-tmux new-session -s cocos-dev -d "bash agents/roles/cocos-dev.sh"
-tmux new-session -s tool-dev  -d "bash agents/roles/tool-dev.sh"
-tmux new-session -s quality-dev -d "bash agents/roles/quality-dev.sh"
 ```
 
-### Step 3 — Attach and Work
+### 4. Attach and watch
 
 ```bash
-# Attach to the tmux session dashboard
 ./tmux/attach.sh
-
-# Or attach to a specific agent
-tmux attach -t cocos-dev
 ```
 
-**Tmux keybindings** (prefix = `Ctrl+b`):
+**Tmux shortcuts:**
 | Key | Action |
 |-----|--------|
 | `Ctrl+b w` | Switch windows (roles) |
 | `Ctrl+b d` | Detach session |
-| `Ctrl+b :` | Command prompt |
-
----
-
-## Role Definitions
-
-### 🏗️ cocos-dev — Cocos Game Developer
-
-**Mission:** Build and implement game features, scenes, mechanics, UI, and gameplay systems in Cocos Creator.
-
-**Skills:**
-- Cocos Creator 3.x TypeScript API (`cc.Component`, `@property`, `cc.Color`, etc.)
-- Cocos 2D sprite, animation, physics (builtin + Box2D)
-- Cocos 3D scene construction and lighting
-- Prefab instantiation, scene loading, resources management
-- UI System (Label, Button, Layout, ScrollView, Mask)
-- Audio playback and effect management
-- Shader and material authoring
-- Build pipeline and asset bundling
-
-**Task Board Tags:** `#feature`, `#scene`, `#ui`, `#gameplay`, `#animation`
-
----
-
-### 🔧 tool-dev — Tool & Infrastructure Developer
-
-**Mission:** Build and maintain development tools, build scripts, CI/CD pipelines, code generators, and asset pipelines that make the team productive.
-
-**Skills:**
-- Shell scripting (bash/zsh) for automation
-- Node.js build tooling (esbuild, webpack plugins, rollup)
-- Asset pipeline scripts (texture atlas, sprite sheet generation)
-- CLI tool development (Commander, Inquirer)
-- Git hooks and pre-commit validation
-- JSON/YAML config file generation and validation
-- Cocos build settings automation (`build.config.json`)
-- Docker containerization for build environments
-
-**Task Board Tags:** `#tool`, `#automation`, `#pipeline`, `#infra`, `#cli`
-
----
-
-### 🎮 quality-dev — Quality & Polish Developer
-
-**Mission:** Playtest, debug, profile performance, write tests, and ensure the game meets quality bar before release. Reports bugs and regressions.
-
-**Skills:**
-- Cocos profiling (`cc.profiler`, performance timeline)
-- Memory leak detection and resource cleanup audits
-- Playtesting — identifying feel issues, pacing, difficulty
-- Automated UI testing via scripting
-- Bug report writing with reproduction steps
-- Accessibility review (touch targets, contrast, font sizes)
-- Frame rate and draw call optimization
-- Unit test authoring for game logic (Jest / Mocha)
-
-**Task Board Tags:** `#bug`, `#perf`, `#test`, `#playtest`, `#polish`, `#accessibility`
+| `Ctrl+b 0–4` | Jump to window |
 
 ---
 
@@ -151,58 +176,33 @@ tmux attach -t cocos-dev
 
 ### Task Board (`configs/task-board.md`)
 
-All tasks are written in the shared markdown task board:
-
-```markdown
-## Backlog
-- [ ] TASK-001: [feature] Implement player movement controls #feature #cocos-dev
-- [ ] TASK-002: [tool] Create sprite sheet packer CLI #tool #tool-dev
-
-## In Progress
-- [ ] TASK-003: [ui] Main menu screen layout #ui #cocos-dev @cocos-dev
-
-## Done
-- [x] TASK-000: [setup] Initialize Cocos project #setup
+All tasks tracked here. Format:
+```
+- [ ] AD-001: [type] Description #tag1 #tag2 @role @unassigned
 ```
 
-### Adding a Task
+Status markers:
+- `[ ]` = open
+- `[~]` = in progress (agent marks this)
+- `[x]` = done
 
-```bash
-# Edit the task board
-vim configs/task-board.md
+### Team Chat (`configs/team-chat.md`)
 
-# Or use the CLI (if tool-dev built it)
-./scripts/add-task.sh "Implement pause menu" feature ui
+Agents post here with `@role` mentions:
 ```
-
-### Agent Communication
-
-Agents write notes to `configs/team-chat.md` when they:
-- Start a task: `> [cocos-dev] Starting TASK-003`
-- Finish a task: `> [cocos-dev] Done: TASK-003 — added pause menu`
-- Hit a blocker: `> [cocos-dev] BLOCKED: needs sprite assets from @tool-dev`
-- Have a question: `> [quality-dev] Q: Is the jump height intentional at 800px?`
+> [creative-dev] Hook v1 done — moving to CTA integration @platform-dev
+> [adops-dev] BLOCKED: Need AppsFlyer key from @creative-dev
+> [qa-dev] Perf audit: Load time 4.2s — needs optimization @platform-dev
+```
 
 ---
 
-## Adding New Roles
+## Adding a New Role
 
-1. Create `agents/roles/<role>.sh`
-2. Create `prompts/<role>-system.md`
-3. Add a window to `tmux/layout.conf`
-4. Add `tmux new-window -t cocos-team -n <role> -d "bash agents/roles/<role>.sh"` to `tmux/session.sh`
-5. Restart the session: `./tmux/session.sh`
-
----
-
-## Troubleshooting
-
-| Problem | Fix |
-|---------|-----|
-| Agent exits immediately | Check `tmux capture-pane -t <session>` for errors |
-| Tasks not updating | All agents read/write `configs/task-board.md` via filesystem |
-| Claude not responding | Detach (`Ctrl+b d`) and reattach `./tmux/attach.sh` |
-| New agent can't find team config | Set `TEAM_DIR=~/cocos-agent-team` before launching |
+1. `agents/roles/<new-role>.sh` — entry point script
+2. `prompts/<new-role>-system.md` — system prompt
+3. Add window to `tmux/session.sh`
+4. Restart: `./tmux/session.sh`
 
 ---
 
@@ -210,7 +210,18 @@ Agents write notes to `configs/team-chat.md` when they:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `TEAM_DIR` | `~/cocos-agent-team` | Root of the team folder |
-| `PROJECT_DIR` | `../PlayableTemplate` | Your Cocos game project root |
-| `CLAUDE_MODEL` | `opus` | Claude model for all agents |
-| `CLAUDE_MAX_TOKENS` | `4096` | Max tokens per agent response |
+| `TEAM_DIR` | `~/cocos-agent-team` | Team root |
+| `PROJECT_DIR` | `../PlayableTemplate` | Ad project root |
+| `CLAUDE_MODEL` | `opus` | Claude model |
+| `CLAUDE_MAX_TOKENS` | `4096` | Max tokens per turn |
+
+---
+
+## Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| Agent exits | `tmux capture-pane -t <window>` to see error |
+| Tasks stuck | Check `configs/task-board.md` — remove stale `@role` locks |
+| Remote push fails | `eval $(ssh-agent)` then `ssh-add ~/.ssh/id_ed25519_personal` |
+| Claude not found | Ensure `claude` CLI is in PATH |

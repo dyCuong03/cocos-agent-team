@@ -1,63 +1,66 @@
 #!/usr/bin/env bash
 # =============================================================================
-# shared.sh — Utility library sourced by all agents
+# shared.sh — Utility library for all agents
 # Usage: source "${TEAM_DIR}/agents/shared.sh"
 # =============================================================================
 
-# Parse a task line from the task board
-# Example line: "- [ ] TASK-001: [feature] Implement jump #feature @cocos-dev"
+# Parse a task line: returns id|type|desc|tags|assignee
 parse_task() {
   local line="$1"
   local id desc type tags assignee
-  id=$(echo "$line" | sed -n 's/.*\-\[.\?\].*\([A-Z]\+-[0-9]\+\):.*/\1/p')
-  desc=$(echo "$line" | sed -n 's/.*\[[^]]*\].*\[[^]]*\].*\([A-Z]\+-[0-9]\+\):\s*\(.*\)/\2/p')
+  id=$(echo "$line" | grep -oP '[A-Z]+-[0-9]+' | head -1)
   type=$(echo "$line" | grep -oP '(?<=\[)[^]]*(?=\])' | head -1)
-  tags=$(echo "$line" | grep -oP '#\w+' | tr '\n' ' ' | xargs)
+  desc=$(echo "$line" | sed -n 's/.*\[[^]]*\].*\[[^]]*\].*\([A-Z]\+-[0-9]\+\):\s*\(.*\)/\2/p')
+  tags=$(echo "$line" | grep -oP '#\w+' | tr '\n' ' ' | sed 's/ #/ /g' | xargs)
   assignee=$(echo "$line" | grep -oP '@\w+' | sed 's/@//' | tr '\n' ' ' | xargs)
   echo "$id|$type|$desc|$tags|$assignee"
 }
 
-# Get all open tasks for a given tag
+# Get all tasks matching a tag
 get_tasks_by_tag() {
   local tag="$1"
-  local board_file="${TASK_BOARD:-${TEAM_DIR}/configs/task-board.md}"
-  grep -E "^- \[ [~ ]\]" "$board_file" 2>/dev/null | grep "#${tag}" || true
+  grep -E "^- \[.+\]" "$TASK_BOARD" 2>/dev/null | grep "#${tag}" || true
 }
 
-# Get next available unassigned task for a set of tags
-get_next_task() {
+# Count open tasks by role
+count_tasks() {
   local role="$1"
-  local board_file="${TASK_BOARD:-${TEAM_DIR}/configs/task-board.md}"
-  grep -E "^- \[ \]" "$board_file" 2>/dev/null | grep "@unassigned\|@${role}" | head -1 || true
+  grep -cE "^- \[ \].*@(unassigned|${role})" "$TASK_BOARD" 2>/dev/null || echo "0"
 }
 
-# Send a message to another agent (write to chat file)
-send_to_agent() {
+# Append a new task to the board
+add_task() {
+  local id="$1"
+  local type="$2"
+  local desc="$3"
+  local tags="$4"
+  local assignee="${5:-unassigned}"
+  echo "- [ ] $id: [$type] $desc $tags @$assignee" >> "$TASK_BOARD"
+}
+
+# DM another agent by writing to chat
+dm_agent() {
   local recipient="$1"
   local message="$2"
-  log_to_team "SYSTEM" "[DM to $recipient] $message"
+  log_to_team "$ROLE_NAME" "[DM→@${recipient}] $message"
 }
 
 # Block until project context is configured
 wait_for_project() {
-  local max_wait=300
   local waited=0
-  while ! grep -q "Project name" "${PROJECT_CONTEXT:-${TEAM_DIR}/configs/project-context.md}" 2>/dev/null; do
+  while ! grep -q "Project name" "${PROJECT_CONTEXT}" 2>/dev/null; do
     sleep 10
     waited=$((waited + 10))
-    echo "[SYSTEM] Waiting for project context to be configured... (${waited}s)"
-    if ((waited >= max_wait)); then
-      echo -e "${C_YELLOW}[WARN] Project context not configured. Set it in configs/project-context.md${C_RESET}"
-      break
-    fi
+    echo "[${ROLE_NAME}] Waiting for project context... (${waited}s)"
+    ((waited >= 300)) && break
   done
 }
 
-# Validate that team directory is accessible
-validate_team_dir() {
-  if [[ ! -d "$TEAM_DIR" ]]; then
-    echo -e "${C_RED}[FATAL] TEAM_DIR not found: $TEAM_DIR${C_RESET}"
-    echo "Set TEAM_DIR environment variable or ensure ~/cocos-agent-team exists"
-    exit 1
+# Validate project directory
+validate_project_dir() {
+  if [[ ! -d "$PROJECT_DIR" ]]; then
+    echo -e "${C_YELLOW}[${ROLE_NAME}] WARNING: PROJECT_DIR not found: $PROJECT_DIR${C_RESET}"
+    echo -e "${C_YELLOW}[${ROLE_NAME}] Create it or set PROJECT_DIR before starting${C_RESET}"
+    log_to_team "$ROLE_NAME" "PROJECT_DIR not found: $PROJECT_DIR"
   fi
 }

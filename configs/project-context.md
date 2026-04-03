@@ -1,50 +1,68 @@
-# Project Context — Edit this before launching the team!
+# Project Context — Playable Ad Campaign Configuration
+# Fill this in before launching the team!
 
-## Game Project
+## Ad Campaign
 
-**Project name:** PlayableTemplate
-**Cocos Creator version:** 3.x (current workspace)
-**Engine type:** Cocos Creator 3.x (TypeScript)
-**Game type:** [Edit this — e.g. 2D Platformer, Puzzle, RPG]
-**Build targets:** Web (primary)
+**Project name:** [Your playable ad name]
+**Game / Brand:** [Brand or game being advertised]
+**Ad Format:** Playable (HTML5 / WebGL)
+**Duration target:** 15–30 seconds (hook + core + CTA)
+**Primary platform:** Google Web Ads, Meta Audience Network
+**Secondary platforms:** AppLovin, Unity Ads, ironSource
 
-## Entry Points
+## Game Summary
 
-- **Main scene:** `assets/scene.fire` (or your entry scene)
-- **Boot scene:** `assets/Boot.fire`
-- **Main script:** `assets/scripts/App.ts` or entry component
+[One paragraph: what the full game is about]
 
-## Project Structure
+## Playable Ad Concept
 
-```
-PROJECT_DIR/
-├── assets/
-│   ├── scenes/          # .fire scene files
-│   ├── scripts/         # TypeScript components
-│   ├── prefabs/         # Reusable prefabs
-│   ├── textures/        # PNG / sprite atlases
-│   └── audio/           # Sound effects & music
-├── build/               # Build output
-├── settings/            # Project settings
-├── scripts/             # Build scripts (created by tool-dev)
-├── tools/               # Dev tools (created by tool-dev)
-├── docs/                # Documentation & reports
-└── tests/               # Unit / smoke tests
-```
+**Hook mechanic:** [Describe the 5-second hook — what action does the user take?]
+**Core loop:** [What is the repeating 10-second action?]
+**Win state:** [What does "winning" look like in the playable?]
+**CTA copy:** [Primary install CTA text — e.g. "Play for Real!"]
+**CTA placement:** [Immediately on win / after timeout / both]
 
-## Key Game Features
+## Brand Guidelines
 
-1. [Describe your game's core features here]
-2. [Replace this template with actual game details]
+**Primary color:** #XXXXXX
+**Accent color:** #XXXXXX
+**Typography:** [Font family and weights]
+**Logo:** [URL or path]
+**Tap targets:** Minimum 44×44px
 
-## Technical Notes
+## Tracking IDs
 
-- Physics: Built-in 2D / 3D physics
-- Target resolution: 1280×720 (letterboxed)
-- Target FPS: 60
+- AppsFlyer App ID: [AF_APP_ID]
+- Adjust App Token: [ADJ_TOKEN]
+- Branch Key: [BRANCH_KEY]
+- Google Ads ID: [GADS_ID]
+- Meta Pixel ID: [META_PIXEL_ID]
+
+## Build Targets
+
+| Platform | Output Path | Minification | Asset Splitting |
+|----------|-------------|--------------|----------------|
+| Web | builds/web | Yes | Yes |
+| Android APK | builds/android | Yes | Yes |
+| iOS | builds/ios | Yes | Yes |
+
+## Bundle Budget
+
+- Initial load: ≤ 5MB
+- Per asset bundle: ≤ 1MB
+- Target FPS: 30+ on mid-range devices
+- Load time (4G): ≤ 5 seconds
+
+## Competitive References
+
+- [Reference playable ad #1 — URL]
+- [Reference playable ad #2 — URL]
+- What works: [1–2 sentences on what you want to emulate]
 
 ## TODO
 
-- [ ] Fill in your actual game details above
-- [ ] Update build targets
-- [ ] List core game features
+- [ ] Fill in all fields above
+- [ ] Confirm tracking IDs with marketing team
+- [ ] Set brand assets (logo, colors, fonts)
+- [ ] Define CTA copy with creative lead
+- [ ] List target countries for compliance
