@@ -110,15 +110,38 @@ Drop raw assets into your Cocos project (typically under `assets/raw/` or the di
 ./tmux/attach.sh
 ```
 
+The session opens **two windows**:
+
+| Window | Name | Contents |
+|--------|------|----------|
+| 0 | `dashboard` | README + live tail of `configs/team-chat.md` |
+| 1 | `team` | 2×2 pane grid — all four agents visible at once |
+
+The `team` window layout:
+
+```
+┌─────────────────────┬─────────────────────┐
+│  design             │  cocos-engineer      │
+│  (wireframes/UX)    │  (scenes/prefabs)    │
+├─────────────────────┼─────────────────────┤
+│  typescript-dev     │  qa-tester           │
+│  (scripts/logic)    │  (playtest/perf)     │
+└─────────────────────┴─────────────────────┘
+```
+
+Each pane runs its role's autonomous loop independently. All four agents are
+visible simultaneously — no window-switching needed to monitor the team.
+
 Tmux shortcuts:
 
 | Key | Action |
 |-----|--------|
-| `Ctrl+b w` | Window switcher |
+| `Ctrl+b z` | Zoom active pane to full-screen (toggle) |
+| `Ctrl+b ←↑→↓` | Move focus between panes |
+| `Ctrl+b w` | Window switcher (dashboard ↔ team) |
 | `Ctrl+b d` | Detach (team keeps running) |
-| `Ctrl+b 0–4` | Jump to window |
-
-Each window starts its role's autonomous loop. Roles poll `configs/task-board.md`, claim matching tasks, and execute.
+| `Ctrl+b 0` | Jump to dashboard window |
+| `Ctrl+b 1` | Jump to team window |
 
 ---
 
@@ -164,7 +187,9 @@ This is what makes the team **token-efficient** across long-running campaigns �
 1. **Skill file** — `skills/<new-role>/SKILL.md` (follow the existing 4 as templates)
 2. **System prompt** — `prompts/<new-role>-system.md` (autonomous-loop wrapper)
 3. **Bash launcher** — `agents/roles/<new-role>.sh` (call `run_agent_loop` with tag list)
-4. **tmux window** — add a `new-window` block to `tmux/session.sh`
+4. **tmux pane** — in `tmux/session.sh`, add a `split-window` block after the existing
+   four panes, capture the pane ID, set its title, then re-run
+   `tmux select-layout -t "$SESSION:team" tiled` to rebalance
 5. Restart: `./tmux/session.sh`
 
 ---
