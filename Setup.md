@@ -1,227 +1,180 @@
-# Cocos Playable Ad Agent Team — Setup & Launch Guide
+# cocos-agent-team — Setup & Launch Guide
 
-## Overview
-
-A **multi-agent tmux team** for autonomous playable ad development. Each agent owns a specialized domain — from gameplay hook design to SDK integration to compliance. They coordinate via a shared filesystem task board and team chat.
-
-```
-cocos-agent-team/
-├── agents/
-│   ├── role-base.sh              # Shared helpers (colors, paths, board utils)
-│   ├── shared.sh                 # Task parsing, agent messaging
-│   └── roles/
-│       ├── creative-dev.sh        # 🎯 Hook design, core loop, gameplay mechanics
-│       ├── platform-dev.sh        # 🔗 SDK integration, WebGL, build export
-│       ├── asset-dev.sh           # 🎨 Art, UI, VFX, end cards
-│       ├── adops-dev.sh           # 📊 Tracking, CI/CD, backend scripts
-│       └── qa-dev.sh             # ✅ Playtest, perf, compliance testing
-├── configs/
-│   ├── task-board.md             # Shared task board
-│   ├── project-context.md         # Ad campaign configuration
-│   └── team-chat.md              # Inter-agent communication log
-├── prompts/
-│   ├── creative-dev-system.md     # 🎯 creative-dev skills + workflow
-│   ├── platform-dev-system.md    # 🔗 platform-dev skills + workflow
-│   ├── asset-dev-system.md        # 🎨 asset-dev skills + workflow
-│   ├── adops-dev-system.md        # 📊 adops-dev skills + workflow
-│   └── qa-dev-system.md           # ✅ qa-dev skills + workflow
-├── tmux/
-│   ├── session.sh                # Launch full tmux session
-│   ├── layout.conf               # Tmux window/pane styling
-│   └── attach.sh                 # Attach to running session
-└── README.md
-```
+A multi-agent tmux team for Cocos Creator 3.8.x playable development. Roles:
+**design**, **cocos-engineer**, **typescript-dev**, **qa-tester**. Wired to
+the `cocos-mcp-server` and `agentmemory` MCP servers.
 
 ---
 
-## The 5 Roles
+## 0. Prerequisites
 
-### 🎯 creative-dev — Playable Ad Creative Designer
-
-**Mission:** Design the hook, core loop, pacing, CTA, and gameplay mechanics that make the ad compelling and conversion-focused.
-
-**Skills:**
-- Playable ad psychology (AARRR funnel, hook model)
-- Rapid onboarding loop design (first 5 seconds)
-- Core mechanic prototyping in Cocos
-- CTA placement and end-card flow
-- Conversion event design (install, signup, purchase)
-- Game feel: juicy feedback, micro-rewards, dopamine hits
-- Mobile UX: tap/swipe/drag interactions
-
-**Task Tags:** `#creative` `#gameplay-design` `#hook` `#core-loop` `#cta`
+- **Cocos Creator 3.8.x** (3.8.6+ recommended) with a project at `${PROJECT_DIR}`
+- **claude CLI** in `$PATH` ([install guide](https://docs.claude.com/en/docs/claude-code/setup))
+- **tmux** (Linux/macOS native; Windows via Git Bash + tmux package or WSL)
+- **Node.js + npx** (for the `agentmemory` MCP server)
+- **curl** (for the role-base.sh MCP pre-flight check)
 
 ---
 
-### 🔗 platform-dev — SDK Integration & Build Engineer
+## 1. Install the Cocos MCP Server
 
-**Mission:** Integrate ad platform SDKs (Google Play Games, AppLovin, Meta, Unity Ads), handle WebGL export, platform-specific build quirks, and device compatibility.
-
-**Skills:**
-- Ad SDK integration: Google Play Install Referrer, AppLovin MAX, Meta Audience Network, Unity Ads, ironSource
-- WebGL 2.0 / WebGL 1.0 compatibility
-- Cocos Creator build pipeline (`cocos build`, `--no-compile`)
-- Cross-platform JS bridging (native ↔ JS)
-- Minification, code splitting, bundle size optimization
-- Device compatibility matrix (Android, iOS, Huawei)
-- Memory budget enforcement (<5MB initial load)
-
-**Task Tags:** `#platform` `#sdk` `#integration` `#webgl` `#build`
-
----
-
-### 🎨 asset-dev — Visual Artist & UI Designer
-
-**Mission:** Produce all visual assets — hero art, icons, UI elements, VFX, end cards, and brand-consistent graphics that drive click-through and install rates.
-
-**Skills:**
-- Vector illustration (SVG → PNG export)
-- Sprite sheet and atlas creation (TexturePacker CLI)
-- Lottie / DOTween animation for UI micro-interactions
-- End card design (store screenshot, CTA button, logo)
-- Iconography (material icons, custom game icons)
-- VFX: particle systems, screen flashes, pop-in animations
-- Font subsetting for bundle size
-- Image optimization (WebP, PNG-8 with alpha, tinypng)
-- Dark/light theme asset variants
-
-**Task Tags:** `#asset` `#ui-design` `#vfx` `#animation` `#end-card` `#icons`
-
----
-
-### 📊 adops-dev — Tracking, Analytics & CI/CD Engineer
-
-**Mission:** Implement tracking events, analytics pipelines, CI/CD automation, backend scripts for server-side events, and build delivery workflows.
-
-**Skills:**
-- Tracking implementation: AppsFlyer, Adjust, Branch, Firebase Analytics
-- Server-side postback scripts (Node.js, Python)
-- Google Tag Manager / dataLayer events
-- GitHub Actions CI/CD (build → upload → notify)
-- S3 / Google Cloud Storage upload pipelines
-- Build versioning and changelog automation
-- CSV/JSON report generation from analytics data
-- Playable ad delivery APIs (doubleVerify, IAS brand safety)
-- A/B test event schema design
-- Docker build environments for reproducible builds
-
-**Task Tags:** `#tracking` `#analytics` `#ci` `#backend` `#postback` `#ab-test`
-
----
-
-### ✅ qa-dev — Quality Assurance & Compliance Engineer
-
-**Mission:** Playtest the playable ad, profile performance, validate tracking, test across devices/browsers, and ensure compliance with ad platform policies.
-
-**Skills:**
-- Playable ad playtesting: hook retention, CTA conversion, play duration
-- Performance profiling: FPS, memory, load time, WebGL stats
-- Device matrix testing (Android 8–14, iOS 14–17, Chrome/Safari/Firefox)
-- Ad policy compliance: Google AWV policy, Meta creative guidelines
-- Tracking verification: AppsFlyer SDK debug mode, Charles Proxy
-- Accessibility review: tap targets ≥ 44px, contrast ≥ 4.5:1
-- Crash reporting integration (Firebase Crashlytics)
-- Pre-launch QA checklist sign-off
-- Regression testing after SDK / asset updates
-- Competitive creative audit (benchmark against top playable ads)
-
-**Task Tags:** `#qa` `#perf` `#test` `#compliance` `#playtest` `#device-test`
-
----
-
-## Quick Start
-
-### 1. Configure the campaign
+This server is the engine-side bridge — every role calls it for scene/node/component/prefab/asset operations.
 
 ```bash
-vim configs/project-context.md
+# 1a. Clone the server into your Cocos project's extensions/
+cd "$PROJECT_DIR/extensions"
+git clone https://github.com/dyCuong03/cocos-mcp-server.git
+cd cocos-mcp-server
+npm install
+npm run build
+
+# 1b. Restart Cocos Creator
+# 1c. In the Cocos Creator editor:
+#       Extension menu → Cocos MCP Server → Start
+#     Confirm it's listening on port 3000 (configurable in the panel)
 ```
 
-Fill in: game name, brand guidelines, CTA copy, target platforms, tracking IDs, bundle size budget.
-
-### 2. Add tasks
+Verify with:
 
 ```bash
-vim configs/task-board.md
+curl -v -X POST http://127.0.0.1:3000/mcp
+# Should return 200 or a JSON-RPC envelope (not Connection refused)
 ```
 
-Tasks use this format:
-```markdown
-- [ ] AD-001: [creative] Design 5-second hook with swipe mechanic #creative @creative-dev @unassigned
-```
+If you remap the port, update `configs/mcp-servers.json` to match.
 
-### 3. Launch the team
+---
+
+## 2. Register MCP Servers with the claude CLI
+
+You have two options.
+
+### Option A — Per-project (used automatically by every role)
+
+The role bash scripts pass `--mcp-config configs/mcp-servers.json` to every `claude` invocation. Nothing extra to do once Cocos MCP is running.
+
+### Option B — Global (so `claude` from any terminal sees them)
 
 ```bash
-cd ~/cocos-agent-team
+claude mcp add --transport http cocos-creator http://127.0.0.1:3000/mcp
+claude mcp add agentmemory npx -- -y @agentmemory/mcp-server
+```
+
+(Adjust the agentmemory command to match your local install — see your agentmemory package's README.)
+
+---
+
+## 3. Configure the Playable
+
+Edit two files:
+
+```bash
+$EDITOR configs/project-context.md     # bundle budget, brand, targets, perf budget
+$EDITOR configs/playable-spec.md       # the storyboard / script (or use playable-spec.json)
+```
+
+If you prefer JSON, follow `configs/spec-schema.json` and write `configs/playable-spec.json` instead — JSON wins over markdown when both are present.
+
+Drop raw assets into your Cocos project (typically under `assets/raw/` or the directory `design`'s asset request points at — `cocos-engineer` imports them via `asset_manage` MCP tool).
+
+---
+
+## 4. Launch the Team
+
+```bash
 ./tmux/session.sh
-```
-
-### 4. Attach and watch
-
-```bash
 ./tmux/attach.sh
 ```
 
-**Tmux shortcuts:**
+Tmux shortcuts:
+
 | Key | Action |
 |-----|--------|
-| `Ctrl+b w` | Switch windows (roles) |
-| `Ctrl+b d` | Detach session |
+| `Ctrl+b w` | Window switcher |
+| `Ctrl+b d` | Detach (team keeps running) |
 | `Ctrl+b 0–4` | Jump to window |
 
----
-
-## Communication Protocol
-
-### Task Board (`configs/task-board.md`)
-
-All tasks tracked here. Format:
-```
-- [ ] AD-001: [type] Description #tag1 #tag2 @role @unassigned
-```
-
-Status markers:
-- `[ ]` = open
-- `[~]` = in progress (agent marks this)
-- `[x]` = done
-
-### Team Chat (`configs/team-chat.md`)
-
-Agents post here with `@role` mentions:
-```
-> [creative-dev] Hook v1 done — moving to CTA integration @platform-dev
-> [adops-dev] BLOCKED: Need AppsFlyer key from @creative-dev
-> [qa-dev] Perf audit: Load time 4.2s — needs optimization @platform-dev
-```
+Each window starts its role's autonomous loop. Roles poll `configs/task-board.md`, claim matching tasks, and execute.
 
 ---
 
-## Adding a New Role
+## 5. The Communication Protocol
 
-1. `agents/roles/<new-role>.sh` — entry point script
-2. `prompts/<new-role>-system.md` — system prompt
-3. Add window to `tmux/session.sh`
-4. Restart: `./tmux/session.sh`
+### Task board — `configs/task-board.md`
+
+```
+- [ ] PB-001: [design] Wireframe HOOK screen #design #wireframe @design @unassigned
+- [~] PB-012: [cocos] Build HOOK scene from wireframe #cocos #scene @cocos-engineer
+- [x] PB-002: [design] Wireframe CORE LOOP #design @design
+```
+
+- `[ ]` open → `[~]` in progress → `[x]` done
+- Tags route tasks to roles (see `agents/roles/<role>.sh` for the tag list)
+- `@unassigned` → first matching agent claims it
+
+### Team chat — `configs/team-chat.md`
+
+```
+> [2026-05-21 14:02] [design] Hook wireframe ready in docs/design/02-hook.md @cocos-engineer
+> [2026-05-21 14:08] [cocos-engineer] HOOK scene built, mounted SwipeHook.ts @qa-tester
+> [2026-05-21 14:30] [qa-tester] QA FAIL — bundle 6.1MB > budget. Filed PB-501 @cocos-engineer
+```
+
+### agentmemory — cross-session whiteboard
+
+Every role calls `memory_recall` on startup and `memory_save` after each deliverable. Keys are namespaced by playable slug + role:
+
+```
+playable:my-playable:design:S01_hook
+playable:my-playable:engineer:HookScene
+playable:my-playable:typescript:SwipeHook
+playable:my-playable:qa:milestone-1
+```
+
+This is what makes the team **token-efficient** across long-running campaigns — you don't pay the cost of re-reading `playable-spec.md` and every wireframe on every session.
 
 ---
 
-## Environment Variables
+## 6. Adding or Modifying a Role
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `TEAM_DIR` | `~/cocos-agent-team` | Team root |
-| `PROJECT_DIR` | `../PlayableTemplate` | Ad project root |
-| `CLAUDE_MODEL` | `opus` | Claude model |
-| `CLAUDE_MAX_TOKENS` | `4096` | Max tokens per turn |
+1. **Skill file** — `skills/<new-role>/SKILL.md` (follow the existing 4 as templates)
+2. **System prompt** — `prompts/<new-role>-system.md` (autonomous-loop wrapper)
+3. **Bash launcher** — `agents/roles/<new-role>.sh` (call `run_agent_loop` with tag list)
+4. **tmux window** — add a `new-window` block to `tmux/session.sh`
+5. Restart: `./tmux/session.sh`
 
 ---
 
-## Troubleshooting
+## 7. Troubleshooting
 
-| Problem | Fix |
+| Symptom | Fix |
 |---------|-----|
-| Agent exits | `tmux capture-pane -t <window>` to see error |
-| Tasks stuck | Check `configs/task-board.md` — remove stale `@role` locks |
-| Remote push fails | `eval $(ssh-agent)` then `ssh-add ~/.ssh/id_ed25519_personal` |
-| Claude not found | Ensure `claude` CLI is in PATH |
+| Role exits immediately | `tmux capture-pane -t <session>:<window>` to read the stderr |
+| `WARN: cocos-mcp-server not reachable` | Open Cocos Creator → Extension → Cocos MCP Server → Start; verify port 3000 with `curl` |
+| Roles all claim the same task | A `sed` race on the board — fix manually, then ensure only one tmux session is active |
+| `agentmemory` errors on first call | Check `configs/mcp-servers.json` command/args match your local install; check `claude mcp list` |
+| `claude: command not found` | Install Claude CLI, ensure it's on `$PATH` in the tmux shell |
+| Tasks stuck `[~]` after restart | Manually rewind `[~] → [ ]` and clear `@<role>` back to `@unassigned` |
+| Build fails inside Cocos | The engineer's bash output will surface the Cocos console errors; `debug_console` MCP tool also dumps them |
+
+---
+
+## 8. Environment Variables
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `TEAM_DIR` | `$HOME/cocos-agent-team` | Repo root |
+| `PROJECT_DIR` | `${TEAM_DIR}/..` | Cocos project root |
+| `SESSION_NAME` | `cocos-playable-team` | tmux session name |
+| `CLAUDE_MODEL` | `opus` | Claude model passed to the CLI |
+| `CLAUDE_MAX_TOKENS` | `4096` | Per-turn cap |
+
+---
+
+## 9. Windows Notes
+
+The bash scripts assume a POSIX shell. On Windows:
+
+- Use **Git Bash** (ships with Git for Windows) and `tmux` from MSYS2, **or** run inside WSL2.
+- Paths in `configs/*.json` use forward slashes; the bash scripts already export `PROJECT_DIR` to work either way.
+- `sed -i` on Windows Git Bash works in-place without a backup arg.

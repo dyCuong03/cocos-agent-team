@@ -1,0 +1,16 @@
+{
+  "_comment": "MCP server config consumed by every role's `claude --mcp-config` invocation. Used by run_claude in agents/role-base.sh. Edit the URLs/env if your local setup differs.",
+  "mcpServers": {
+    "cocos-creator": {
+      "type": "http",
+      "url": "http://127.0.0.1:3000/mcp",
+      "_notes": "Provided by https://github.com/dyCuong03/cocos-mcp-server installed as a Cocos Creator extension. Start via Extension → Cocos MCP Server → Start in the Cocos Creator editor. Default port 3000; change here and in the editor panel together if you remap."
+    },
+    "agentmemory": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@agentmemory/mcp-server"],
+      "_notes": "Cross-session memory for the team. Used by every role to recall prior decisions and save compact summaries instead of re-reading large docs. Adjust command/args to match your local agentmemory MCP install."
+    }
+  }
+}

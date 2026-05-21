@@ -1,62 +1,70 @@
-# Playable Ad Team — Task Board
-# Format: - [ ] AD-001: [type] Description #tag @role @unassigned
+# Cocos Playable Team — Task Board
+
+Format: `- [ ] PB-001: [type] Description #tag1 #tag2 @role @unassigned`
+
+Status: `[ ]` open → `[~]` in progress → `[x]` done.
+Agents poll this file and claim tasks matching their tag list.
 
 ---
 
-## 🎯 Creative Backlog
+## 🎨 Design Backlog
 
-- [ ] AD-001: [creative] Design 5-second hook with swipe mechanic #creative #hook @creative-dev @unassigned
-- [ ] AD-002: [creative] Prototype core loop — 3 core actions, escalating difficulty #creative #core-loop @creative-dev @unassigned
-- [ ] AD-003: [creative] Write 3 CTA variations (urgency / reward / social proof) #creative #cta @creative-dev @unassigned
-- [ ] AD-004: [creative] Design reward moment — feedback burst on level complete #creative #gameplay-design @creative-dev @unassigned
-- [ ] AD-005: [creative] Map AARRR funnel: impression → hook → core → CTA → install #creative #conversion @creative-dev @unassigned
-
----
-
-## 🔗 Platform Backlog
-
-- [ ] AD-010: [platform] Integrate AppsFlyer SDK for event tracking #platform #sdk @platform-dev @unassigned
-- [ ] AD-011: [platform] Integrate AppLovin MAX for mediation #platform #sdk #integration @platform-dev @unassigned
-- [ ] AD-012: [platform] WebGL 2.0 compatibility audit and fallback #platform #webgl @platform-dev @unassigned
-- [ ] AD-013: [platform] Configure CI/CD build pipeline for web export #platform #ci #build @platform-dev @unassigned
-- [ ] AD-014: [platform] Enforce 5MB bundle budget — split assets into bundles #platform #build @platform-dev @unassigned
+- [ ] PB-001: [design] Parse playable spec → list every screen with screen-id #design #screen @design @unassigned
+- [ ] PB-002: [design] Wireframe HOOK screen with interaction contract #design #wireframe #ui @design @unassigned
+- [ ] PB-003: [design] Wireframe CORE LOOP screen with interaction contract #design #wireframe #ui @design @unassigned
+- [ ] PB-004: [design] Wireframe WIN/FAIL feedback screens #design #wireframe #ui @design @unassigned
+- [ ] PB-005: [design] Wireframe END CARD / CTA screen #design #wireframe #ui @design @unassigned
+- [ ] PB-006: [design] Produce asset request list per screen #design #flow @design @unassigned
 
 ---
 
-## 🎨 Asset Backlog
+## 🛠 Cocos Engineer Backlog
 
-- [ ] AD-020: [asset] Create hero art for end card (store screenshot style) #asset #end-card @asset-dev @unassigned
-- [ ] AD-021: [asset] Design CTA button with tap animation (3 states) #asset #ui-design @asset-dev @unassigned
-- [ ] AD-022: [asset] Build reward VFX — burst particle spritesheet #asset #vfx @asset-dev @unassigned
-- [ ] AD-023: [asset] Create icon set (12 icons: play, reward, level, lock, etc.) #asset #icons @asset-dev @unassigned
-- [ ] AD-024: [asset] Animate hook intro — character entrance + mechanic reveal #asset #animation @asset-dev @unassigned
+- [ ] PB-010: [cocos] Verify Cocos Creator 3.8.x project structure, set up assets/{scenes,prefabs,scripts,textures} #cocos #scene @cocos-engineer @unassigned
+- [ ] PB-011: [cocos] Import all assets from design's asset request list #cocos #asset-import @cocos-engineer @unassigned
+- [ ] PB-012: [cocos] Build HOOK scene from wireframe #cocos #scene @cocos-engineer @unassigned
+- [ ] PB-013: [cocos] Build CORE LOOP scene from wireframe #cocos #scene @cocos-engineer @unassigned
+- [ ] PB-014: [cocos] Build END CARD scene from wireframe #cocos #scene @cocos-engineer @unassigned
+- [ ] PB-015: [cocos] Extract reusable components into prefabs (button, particle burst, end-card) #cocos #prefab @cocos-engineer @unassigned
+- [ ] PB-016: [cocos] Wire animations + particle systems per wireframe #cocos #anim #particle @cocos-engineer @unassigned
+- [ ] PB-017: [cocos] Mount typescript-dev's components onto their target nodes #cocos #editor @cocos-engineer @unassigned
+- [ ] PB-018: [cocos] Configure web-mobile build settings + run a test build #cocos #build @cocos-engineer @unassigned
 
 ---
 
-## 📊 AdOps Backlog
+## 💻 TypeScript Backlog
 
-- [ ] AD-030: [adops] Implement tracking event schema (10 events) #tracking @adops-dev @unassigned
-- [ ] AD-031: [adops] Set up AppsFlyer postback to Adjust server-side #analytics #backend @adops-dev @unassigned
-- [ ] AD-032: [adops] Write A/B test event schema for CTA copy variants #ab-test #tracking @adops-dev @unassigned
-- [ ] AD-033: [adops] Build CDN upload script with cache invalidation #ci #backend @adops-dev @unassigned
-- [ ] AD-034: [adops] Create daily build report generator (FPS, load time, bundle size) #analytics @adops-dev @unassigned
+- [ ] PB-020: [ts] Implement HOOK input handler (swipe/tap/drag per spec) #ts #input #gameplay @typescript-dev @unassigned
+- [ ] PB-021: [ts] Implement CORE LOOP state machine #ts #state-machine #gameplay @typescript-dev @unassigned
+- [ ] PB-022: [ts] Implement WIN / FAIL state handlers with feedback hooks #ts #logic @typescript-dev @unassigned
+- [ ] PB-023: [ts] Implement CTA controller with deep-link / store-open #ts #logic @typescript-dev @unassigned
+- [ ] PB-024: [ts] Audio manager (pool AudioSource, mute toggle, sfx hooks) #ts #audio @typescript-dev @unassigned
+- [ ] PB-025: [ts] Game controller / scene flow orchestrator #ts #state-machine #gameplay @typescript-dev @unassigned
 
 ---
 
 ## ✅ QA Backlog
 
-- [ ] AD-040: [qa] Full playtest: hook retention, duration, CTA conversion #playtest @qa-dev @unassigned
-- [ ] AD-041: [qa] Performance audit: FPS heatmap per scene, memory timeline #perf @qa-dev @unassigned
-- [ ] AD-042: [qa] Device matrix test: 5 devices, 2 OS versions, 3 browsers #device-test @qa-dev @unassigned
-- [ ] AD-043: [qa] Google AWV policy compliance review #compliance @qa-dev @unassigned
-- [ ] AD-044: [qa] Tracking verification — confirm all 10 events fire correctly #test #tracking @qa-dev @unassigned
+- [ ] PB-030: [qa] Structural pass — every wireframe node exists in built scene #qa #test @qa-tester @unassigned
+- [ ] PB-031: [qa] Behaviour pass — every interaction-contract row passes #qa #playtest @qa-tester @unassigned
+- [ ] PB-032: [qa] Perf pass — record FPS, bundle size, load time vs project-context budget #qa #perf @qa-tester @unassigned
+- [ ] PB-033: [qa] Validation pass — validation_scene + validation_asset clean #qa #regression @qa-tester @unassigned
+- [ ] PB-034: [qa] Milestone sign-off — write final report in docs/qa/ #qa #signoff #release @qa-tester @unassigned
 
 ---
 
 ## In Progress
 
+<!-- Marked [~] tasks appear here visually but stay in their backlog section -->
+
 ---
 
 ## Done
 
-<!-- Mark [x] when complete -->
+<!-- Marked [x] when complete -->
+
+---
+
+## QA-Filed Bugs
+
+<!-- qa-tester appends rows here with #qa-bug tag and an @<role> assignee -->

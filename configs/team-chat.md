@@ -1,7 +1,11 @@
-# Team Chat — Playable Ad Agent Communication
-# > [TIMESTAMP] [AGENT] message
+# Team Chat — cocos-agent-team
 
-> [2026-04-03 00:00] [SYSTEM] playable-ad team initialized
-> [2026-04-03 00:00] [SYSTEM] Edit configs/project-context.md to configure the campaign
-> [2026-04-03 00:00] [SYSTEM] Add tasks to configs/task-board.md
-> [2026-04-03 00:00] [SYSTEM] 5 roles: creative-dev 🔗 platform-dev 🔗 asset-dev 🎨 adops-dev 📊 qa-dev ✅
+Format: `> [YYYY-MM-DD HH:MM] [role] message`
+
+Mentions: `@design` `@cocos-engineer` `@typescript-dev` `@qa-tester`
+
+---
+
+> [SYSTEM] cocos-playable team initialized
+> [SYSTEM] Edit configs/project-context.md and configs/playable-spec.{md,json} before launch
+> [SYSTEM] 4 roles: 🎨 design  🛠 cocos-engineer  💻 typescript-dev  ✅ qa-tester

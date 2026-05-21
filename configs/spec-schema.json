@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Playable Spec",
+  "description": "Structured JSON form of the playable spec. Equivalent to configs/spec-template.md. If both exist, JSON wins.",
+  "type": "object",
+  "required": ["meta", "audience", "screens"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["slug", "title", "pitch"],
+      "properties": {
+        "slug":           { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "title":          { "type": "string" },
+        "pitch":          { "type": "string", "maxLength": 200 },
+        "referencePlayables": { "type": "array", "items": { "type": "string" } },
+        "durationSeconds":    { "type": "integer", "minimum": 5, "maximum": 90 }
+      }
+    },
+    "audience": {
+      "type": "object",
+      "required": ["platform", "orientation"],
+      "properties": {
+        "platform":        { "type": "string", "enum": ["google-web-ads", "meta", "applovin", "ironsource", "unity-ads", "standalone"] },
+        "targetDeviceClass": { "type": "string" },
+        "orientation":     { "type": "string", "enum": ["portrait", "landscape", "both"] },
+        "aspectRatios":    { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "screens": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "goal", "inputs", "outputs", "transitions", "acceptance"],
+        "properties": {
+          "id":              { "type": "string", "pattern": "^S[0-9]{2}_[a-z0-9_]+$" },
+          "goal":            { "type": "string" },
+          "durationSeconds": { "type": "number" },
+          "visual":          { "type": "string" },
+          "audio":           { "type": "string" },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "type"],
+              "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string", "enum": ["tap", "swipe", "drag", "hold", "tilt", "key", "none"] },
+                "target": { "type": "string", "description": "node path the input is bound to" }
+              }
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["trigger", "effect"],
+              "properties": {
+                "trigger": { "type": "string", "description": "which input or condition fires this" },
+                "effect":  { "type": "string", "description": "visual/audio/state change produced" }
+              }
+            }
+          },
+          "transitions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["on", "to"],
+              "properties": {
+                "on":   { "type": "string" },
+                "to":   { "type": "string", "description": "next screen id" }
+              }
+            }
+          },
+          "acceptance": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "assetsProvided": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string" },
+          "type": { "type": "string", "enum": ["image", "audio", "font", "anim", "particle", "atlas", "other"] },
+          "size": { "type": "string" }
+        }
+      }
+    },
+    "assetsRequired": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name":  { "type": "string" },
+          "type":  { "type": "string", "enum": ["image", "audio", "font", "anim", "particle", "atlas", "other"] },
+          "specs": { "type": "string", "description": "size/format/notes" }
+        }
+      }
+    },
+    "nonGoals": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

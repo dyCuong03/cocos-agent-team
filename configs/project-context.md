@@ -1,68 +1,79 @@
-# Project Context — Playable Ad Campaign Configuration
-# Fill this in before launching the team!
+# Project Context — Cocos Playable Configuration
 
-## Ad Campaign
+Fill this in **before launching the team**. Every agent reads this once per session
+and caches it via agentmemory. Leaving placeholders here means the agents will
+keep asking — or worse, guessing.
 
-**Project name:** [Your playable ad name]
-**Game / Brand:** [Brand or game being advertised]
-**Ad Format:** Playable (HTML5 / WebGL)
-**Duration target:** 15–30 seconds (hook + core + CTA)
-**Primary platform:** Google Web Ads, Meta Audience Network
-**Secondary platforms:** AppLovin, Unity Ads, ironSource
+## Playable Identity
 
-## Game Summary
+- **Project slug:** `playable-name`  *(short, lower-kebab — used as agentmemory key prefix)*
+- **Display name:** Playable Display Name
+- **Game / Brand:** What game does this playable advertise / showcase
+- **Cocos Creator version:** 3.8.x  *(pin the exact patch in `.cocos-version`)*
+- **Primary platform:** Google Web Ads | Meta Audience Network | AppLovin | IronSource | Unity Ads | Standalone
+- **Aspect / orientation:** portrait (9:16) | landscape (16:9) | both
 
-[One paragraph: what the full game is about]
+## Playable Concept
 
-## Playable Ad Concept
+- **Genre / mechanic family:** match-3 | runner | puzzle | shooter | hyper-casual | sim
+- **Hook (first 5s):** what action does the user take in the opening
+- **Core loop (5–20s):** the repeating action
+- **Win state:** what "winning" looks like
+- **CTA copy:** primary install/download text
+- **CTA placement:** on-win | timeout | both
 
-**Hook mechanic:** [Describe the 5-second hook — what action does the user take?]
-**Core loop:** [What is the repeating 10-second action?]
-**Win state:** [What does "winning" look like in the playable?]
-**CTA copy:** [Primary install CTA text — e.g. "Play for Real!"]
-**CTA placement:** [Immediately on win / after timeout / both]
+## Brand & Visual
 
-## Brand Guidelines
-
-**Primary color:** #XXXXXX
-**Accent color:** #XXXXXX
-**Typography:** [Font family and weights]
-**Logo:** [URL or path]
-**Tap targets:** Minimum 44×44px
-
-## Tracking IDs
-
-- AppsFlyer App ID: [AF_APP_ID]
-- Adjust App Token: [ADJ_TOKEN]
-- Branch Key: [BRANCH_KEY]
-- Google Ads ID: [GADS_ID]
-- Meta Pixel ID: [META_PIXEL_ID]
+- **Primary color:** `#XXXXXX`
+- **Accent color:** `#XXXXXX`
+- **Typography:** font family + weights
+- **Logo path:** `assets/brand/logo.png`
+- **Min tap target:** 44 × 44 px
+- **Safe area:** define top/bottom/left/right insets
 
 ## Build Targets
 
-| Platform | Output Path | Minification | Asset Splitting |
-|----------|-------------|--------------|----------------|
-| Web | builds/web | Yes | Yes |
-| Android APK | builds/android | Yes | Yes |
-| iOS | builds/ios | Yes | Yes |
+| Platform     | Output Path           | Minify | Asset Splitting | WebGL |
+|--------------|-----------------------|--------|-----------------|-------|
+| Web-mobile   | `build/web-mobile/`   | yes    | yes             | 2.0   |
+| Web-desktop  | `build/web-desktop/`  | yes    | yes             | 2.0   |
 
-## Bundle Budget
+## Perf Budget (qa-tester enforces)
 
-- Initial load: ≤ 5MB
-- Per asset bundle: ≤ 1MB
-- Target FPS: 30+ on mid-range devices
-- Load time (4G): ≤ 5 seconds
+- **FPS target (mid-range Android):** ≥ 30 avg, ≥ 24 min
+- **Bundle (initial load):** ≤ 5 MB
+- **Per-bundle cap:** ≤ 1 MB
+- **Cold load on 4G:** ≤ 5 s
+- **Peak memory:** ≤ 200 MB
 
-## Competitive References
+## Tracking / Deep-link (if applicable)
 
-- [Reference playable ad #1 — URL]
-- [Reference playable ad #2 — URL]
-- What works: [1–2 sentences on what you want to emulate]
+- **App store URL (iOS):**
+- **App store URL (Android):**
+- **AppsFlyer / Adjust / Branch:** (optional — fill if tracking is in scope)
 
-## TODO
+## Acceptance — Definition of Done
 
-- [ ] Fill in all fields above
-- [ ] Confirm tracking IDs with marketing team
-- [ ] Set brand assets (logo, colors, fonts)
-- [ ] Define CTA copy with creative lead
-- [ ] List target countries for compliance
+A playable is "done" when:
+
+1. Every screen named in `configs/playable-spec.{md|json}` has a matching wireframe in `docs/design/` and built scene/prefab in `assets/scenes/`
+2. Every interaction-contract row passes qa-tester's behaviour pass
+3. Perf budget above is met on the qa-tester's test device matrix
+4. `validation_scene` + `validation_asset` are clean
+5. qa-tester has issued an explicit PASS verdict in `docs/qa/`
+
+## Reference Playables (optional)
+
+- URL: …
+- What works: …
+
+---
+
+## TODO before launch
+
+- [ ] Set the project slug
+- [ ] Fill brand colors + logo
+- [ ] Decide platform + orientation
+- [ ] Confirm perf budget with stakeholders
+- [ ] Drop the playable spec into `configs/playable-spec.md` or `configs/playable-spec.json`
+- [ ] Drop reference / brand assets into `${PROJECT_DIR}/assets/`
