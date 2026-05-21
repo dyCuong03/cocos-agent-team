@@ -6,6 +6,30 @@ the `cocos-mcp-server` and `agentmemory` MCP servers.
 
 ---
 
+## Quick Start (one command)
+
+```bash
+./setup.sh
+```
+
+This single script does everything in §1–§2 below **plus** installs the four
+playable skills (`/cocos-playable-design`, `/cocos-playable-engineer`,
+`/cocos-playable-typescript`, `/cocos-playable-qa`) into `~/.claude/skills/`
+so they are available as slash commands in **any** Claude Code project on this
+machine, not just this repo.
+
+If your Cocos project lives outside this repo:
+
+```bash
+./setup.sh --project-dir /path/to/your/cocos-project
+# or
+PROJECT_DIR=/path/to/your/cocos-project ./setup.sh
+```
+
+After `setup.sh` completes, skip to §3 (Configure the Playable).
+
+---
+
 ## 0. Prerequisites
 
 - **Cocos Creator 3.8.x** (3.8.6+ recommended) with a project at `${PROJECT_DIR}`
