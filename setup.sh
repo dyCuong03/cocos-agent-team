@@ -5,8 +5,13 @@
 # What it does:
 #   1. Checks prerequisites (claude, curl, npx, git)
 #   2. Sets up MCP servers (cocos-creator + agentmemory)
-#   3. Installs the 4 playable skills into ~/.claude/skills/ so they are
-#      available in ANY Claude Code project, not just this one
+#   3. Installs the 5 playable skills into ~/.claude/skills/ so they are
+#      available in ANY Claude Code project, not just this one:
+#        /playable-team         — coordinate & launch a task-specific team
+#        /cocos-playable-design
+#        /cocos-playable-engineer
+#        /cocos-playable-typescript
+#        /cocos-playable-qa
 #
 # Usage:
 #   ./setup.sh
@@ -67,7 +72,7 @@ TEAM_DIR="$TEAM_DIR" PROJECT_DIR="$PROJECT_DIR" bash "${TEAM_DIR}/scripts/bootst
 
 # ── Step 3: Install skills globally ──────────────────────────────────────────
 echo ""
-echo -e "${C_GREEN}[3/3] Installing Claude Code skills globally...${C_RESET}"
+echo -e "${C_GREEN}[3/3] Installing Claude Code skills globally (5 skills)...${C_RESET}"
 
 CLAUDE_SKILLS_DIR="${HOME}/.claude/skills"
 mkdir -p "$CLAUDE_SKILLS_DIR"
@@ -85,6 +90,7 @@ install_skill() {
   fi
 }
 
+install_skill "playable-team/SKILL.md"  "playable-team"
 install_skill "design/SKILL.md"         "cocos-playable-design"
 install_skill "cocos-engineer/SKILL.md" "cocos-playable-engineer"
 install_skill "typescript-dev/SKILL.md" "cocos-playable-typescript"
@@ -98,6 +104,7 @@ echo -e "${C_CYAN}============================================${C_RESET}"
 echo ""
 echo "  Skills installed to: ${CLAUDE_SKILLS_DIR}"
 echo "  Available as slash commands in any Claude Code project:"
+echo "    /playable-team           ← start here: describe a task, get a team"
 echo "    /cocos-playable-design"
 echo "    /cocos-playable-engineer"
 echo "    /cocos-playable-typescript"
@@ -106,7 +113,8 @@ echo ""
 echo "  Next steps:"
 echo "    1. Edit configs/project-context.md  (playable identity & budget)"
 echo "    2. Edit configs/playable-spec.md    (storyboard)"
-echo "    3. ./tmux/session.sh                (launch the agent team)"
+echo "    3. /playable-team in Claude Code    (describe your task → team auto-assembled)"
+echo "       or: ./tmux/session.sh            (launch all four agents at once)"
 echo ""
 echo "  See Setup.md for details."
 echo ""

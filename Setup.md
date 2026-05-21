@@ -12,11 +12,17 @@ the `cocos-mcp-server` and `agentmemory` MCP servers.
 ./setup.sh
 ```
 
-This single script does everything in §1–§2 below **plus** installs the four
-playable skills (`/cocos-playable-design`, `/cocos-playable-engineer`,
-`/cocos-playable-typescript`, `/cocos-playable-qa`) into `~/.claude/skills/`
-so they are available as slash commands in **any** Claude Code project on this
-machine, not just this repo.
+This single script does everything in §1–§2 below **plus** installs five
+skills into `~/.claude/skills/` so they are available as slash commands in
+**any** Claude Code project on this machine:
+
+| Skill | Purpose |
+|-------|---------|
+| `/playable-team` | Describe a task → get a minimal team assembled automatically |
+| `/cocos-playable-design` | UI/UX design, wireframes, asset specs |
+| `/cocos-playable-engineer` | Scene hierarchy, prefabs, asset import |
+| `/cocos-playable-typescript` | Gameplay scripts, state machines, input |
+| `/cocos-playable-qa` | Playtest, perf, regression, sign-off |
 
 If your Cocos project lives outside this repo:
 
@@ -26,7 +32,15 @@ If your Cocos project lives outside this repo:
 PROJECT_DIR=/path/to/your/cocos-project ./setup.sh
 ```
 
-After `setup.sh` completes, skip to §3 (Configure the Playable).
+After `setup.sh` completes, the fastest way to start working is:
+
+```bash
+# In any Claude Code project, describe your task:
+/playable-team I need to add a new interactive hook screen with a tap mechanic
+```
+
+Claude will select the right agents, write tasks to the board, and launch them.
+Or skip to §3 to configure the playable manually before launching.
 
 ---
 
@@ -182,7 +196,49 @@ This is what makes the team **token-efficient** across long-running campaigns �
 
 ---
 
-## 6. Adding or Modifying a Role
+## 6. Task-Specific Teams with `/playable-team`
+
+Instead of always launching all four agents, use the `/playable-team` skill to
+assemble only the agents your task actually needs.
+
+### Via Claude Code (recommended)
+
+```bash
+/playable-team Fix the swipe input on the hook screen
+# → selects typescript-dev only; writes tasks; runs start-team.sh typescript-dev
+```
+
+```bash
+/playable-team Build the end-card screen from scratch
+# → selects design + cocos-engineer + typescript-dev; writes tasks; launches all three
+```
+
+Claude selects the minimum role set, appends tasks to `configs/task-board.md`
+with the right tags, and runs the launch script for you.
+
+### Via CLI directly
+
+```bash
+# One agent
+./scripts/start-team.sh typescript-dev
+
+# Two agents, with a task description logged to team-chat
+./scripts/start-team.sh design cocos-engineer --task "Hook screen wireframe + scene build"
+
+# Three agents
+./scripts/start-team.sh design cocos-engineer typescript-dev
+
+# All four (same as ./tmux/session.sh)
+./scripts/start-team.sh
+```
+
+`start-team.sh` opens the same 2-window layout as `session.sh` but with panes
+only for the roles you specified. The `tiled` layout adapts to 1–4 panes
+automatically.
+
+---
+
+## 7. Adding or Modifying a Role
 
 1. **Skill file** — `skills/<new-role>/SKILL.md` (follow the existing 4 as templates)
 2. **System prompt** — `prompts/<new-role>-system.md` (autonomous-loop wrapper)
@@ -194,7 +250,7 @@ This is what makes the team **token-efficient** across long-running campaigns �
 
 ---
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
@@ -208,7 +264,7 @@ This is what makes the team **token-efficient** across long-running campaigns �
 
 ---
 
-## 8. Environment Variables
+## 9. Environment Variables
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
@@ -220,7 +276,7 @@ This is what makes the team **token-efficient** across long-running campaigns �
 
 ---
 
-## 9. Windows Notes
+## 10. Windows Notes
 
 The bash scripts assume a POSIX shell. On Windows:
 
