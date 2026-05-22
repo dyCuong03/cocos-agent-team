@@ -103,17 +103,23 @@ cocos-agent-team/
 │       ├── typescript-dev.sh
 │       └── qa-tester.sh
 ├── configs/
-│   ├── project-context.md           # Per-playable config
+│   ├── project-context.md           # Per-playable config (fill before launch)
+│   ├── project-context-template.md  # Template used by new-playable.sh
 │   ├── playable-spec.md             # Markdown spec (see spec-template.md)
 │   ├── playable-spec.json           # OR JSON spec (see spec-schema.json)
 │   ├── spec-template.md
 │   ├── spec-schema.json
-│   ├── mcp-servers.json             # cocos-creator + agentmemory MCP config
-│   ├── task-board.md                # Shared task board
+│   ├── mcp-servers.json             # cocos-creator + agentmemory MCP config (never reset)
+│   ├── task-board.md                # Shared task board (live)
+│   ├── task-board.default.md        # Blank template — source for /new resets
 │   └── team-chat.md                 # Inter-agent log
+├── archive/                         # Prior-run snapshots (created by /new)
+│   └── {slug}/{YYYY-MM-DD}/         # One folder per run; configs + docs preserved
+├── skills/
+│   └── cocos-agent-team/SKILL.md    # Orchestrator skill (install → .claude/skills/)
 ├── scripts/
 │   ├── bootstrap-mcp.sh             # One-shot MCP setup
-│   └── new-playable.sh              # Scaffold a new playable run
+│   └── new-playable.sh              # Scaffold a new playable run (archives prior)
 └── tmux/
     ├── session.sh
     ├── layout.conf
@@ -158,3 +164,28 @@ cocos-agent-team/
 | agentmemory | (MCP) | Compact decision summaries shared across all roles |
 
 Mentions: `@design`, `@cocos-engineer`, `@typescript-dev`, `@qa-tester`.
+
+---
+
+## Starting a New Playable (`/new`)
+
+```bash
+# Terminal
+./scripts/new-playable.sh --slug bubble-pop
+
+# Claude Code skill
+/cocos-agent-team new
+```
+
+`/new` is safe by default:
+1. **Archives** the current run to `archive/{slug}/{YYYY-MM-DD}/` before touching anything
+2. **Shows a manifest** of what will be archived, reset, and protected — requires confirmation
+3. **Resets** only the run-specific files: `team-chat.md`, `task-board.md`, `playable-spec.md`, `project-context.md`, `docs/`
+4. **Never touches** `mcp-servers.json`, `skills/`, `prompts/`, `agents/`, `scripts/`, or agentmemory
+
+| Flag | Behavior |
+|------|----------|
+| `--slug <slug>` | Set new slug without interactive prompt |
+| `--keep-tasks` | Skip task-board reset (preserve in-progress board) |
+| `--no-archive` | Skip archive step (destructive — use only for scratch runs) |
+| `--force` | Skip all confirmation prompts (for CI/automation) |

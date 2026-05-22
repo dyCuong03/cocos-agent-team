@@ -36,7 +36,7 @@ Trigger `/cocos-agent-team` whenever:
 
 ## Workspace Layout
 
-All coordination files live under `cocos-agent-team/` inside the project root:
+All coordination files live under `cocos-agent-team/` inside the project root (`E:\Cocos\Projects\PlayableTemplate\`):
 
 ```
 cocos-agent-team/
@@ -50,16 +50,13 @@ cocos-agent-team/
 │   ├── cocos-playable-design/SKILL.md
 │   ├── cocos-playable-engineer/SKILL.md
 │   ├── cocos-playable-typescript/SKILL.md
-│   ├── cocos-playable-qa/SKILL.md
-│   └── cocos-agent-team/SKILL.md   ← this file
+│   └── cocos-playable-qa/SKILL.md
 └── docs/
     ├── design/             ← wireframes + asset requests (design output)
     └── qa/                 ← QA reports (qa-tester output)
 ```
 
 Scripts live at `assets/scripts/`, scenes at `assets/scenes/`, builds at `build/web-mobile/`.
-
-The Claude Code skill counterparts live at `.claude/skills/` in the project root and mirror the files in `skills/` above.
 
 ---
 
@@ -108,7 +105,7 @@ Agent({
 </role-skill>
 
 ## Context
-- Project root: {PROJECT_ROOT}
+- Project root: E:\\Cocos\\Projects\\PlayableTemplate
 - Spec: cocos-agent-team/configs/playable-spec.md (or .json)
 - Project context: cocos-agent-team/configs/project-context.md
 - Task board: cocos-agent-team/configs/task-board.md
@@ -146,7 +143,7 @@ Agent({
 </role-skill>
 
 ## Context
-- Project root: {PROJECT_ROOT}
+- Project root: E:\\Cocos\\Projects\\PlayableTemplate
 - Wireframes: docs/design/
 - Task board: cocos-agent-team/configs/task-board.md
 - Team chat: cocos-agent-team/configs/team-chat.md
@@ -170,7 +167,7 @@ Agent({
 </role-skill>
 
 ## Context
-- Project root: {PROJECT_ROOT}
+- Project root: E:\\Cocos\\Projects\\PlayableTemplate
 - Wireframes (interaction contracts): docs/design/
 - Task board: cocos-agent-team/configs/task-board.md
 - Team chat: cocos-agent-team/configs/team-chat.md
@@ -200,7 +197,7 @@ Agent({
 </role-skill>
 
 ## Context
-- Project root: {PROJECT_ROOT}
+- Project root: E:\\Cocos\\Projects\\PlayableTemplate
 - Spec: cocos-agent-team/configs/playable-spec.md (or .json)
 - Project context: cocos-agent-team/configs/project-context.md
 - Wireframes: docs/design/
@@ -290,12 +287,148 @@ QA            0/5 ⬜             Waiting on Phase 2
 
 When the user passes `new` as an argument or says "start a new playable":
 
-1. Ask for a project slug.
-2. Copy `configs/spec-template.md` content and display it for the user to fill in.
-3. Write a fresh `configs/project-context.md` from user input.
-4. Reset `configs/task-board.md` to the default template (all tasks `[ ]`).
-5. Clear `configs/team-chat.md` to just the system header.
-6. Confirm: "Workspace reset for `{slug}`. Fill in `configs/playable-spec.md` and run `/cocos-agent-team` to launch."
+### Step 0 — Read Current State (Non-Destructive)
+
+Before asking the user anything:
+
+1. Read `configs/project-context.md` → extract the current `Project slug` field. Call it `{prior-slug}`.
+2. Count files in `docs/design/` and `docs/qa/` (if those directories exist).
+3. Note whether `configs/playable-spec.md` or `configs/playable-spec.json` exists.
+
+If `{prior-slug}` is empty and there are no files to archive, skip Step 3 (archive).
+
+---
+
+### Step 1 — Gather New Playable Inputs
+
+Ask the user:
+
+| Field | Prompt | Default |
+|-------|--------|---------|
+| **Project slug** | kebab-case, e.g. `bubble-pop` | — required |
+| **Working title** | display name | — required |
+| **Primary platform** | `Google Web Ads` \| `Meta` \| `AppLovin` \| `IronSource` \| `Unity` | — |
+| **Orientation** | `portrait` \| `landscape` | `portrait` |
+| **Bundle budget (MB)** | max compressed initial bundle | `5` |
+| **FPS floor** | `{avg}/{min}` e.g. `30/24` | `30/24` |
+
+Reject slugs with spaces, underscores, or uppercase letters. Do not proceed until the slug is confirmed.
+
+---
+
+### Step 2 — Show Reset Manifest and Get Confirmation
+
+Print this manifest **before touching any file**:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  New playable : {new-slug}
+│  Replacing    : {prior-slug}  (if any)
+├── ARCHIVE → archive/{prior-slug}/{YYYY-MM-DD}/ ─────────┤
+│  ✦ configs/team-chat.md
+│  ✦ configs/task-board.md
+│  ✦ configs/playable-spec.{md,json}
+│  ✦ configs/project-context.md
+│  ✦ docs/design/  ({N} files)
+│  ✦ docs/qa/      ({N} files)
+├── RESET ───────────────────────────────────────────────┤
+│  ↺ configs/team-chat.md       → system header
+│  ↺ configs/task-board.md      → blank backlog (task-board.default.md)
+│  ↺ configs/playable-spec.md   → spec template
+│  ↺ configs/project-context.md → {new-slug} values
+│  ↺ docs/design/ + docs/qa/    → empty
+├── PROTECTED (never touched by /new) ──────────────────┤
+│  ✓ configs/mcp-servers.json
+│  ✓ skills/  (all role skills + theone-cocos-standards)
+│  ✓ prompts/ · agents/ · scripts/
+│  ✓ agentmemory: playable:{prior-slug}:* stays intact
+└─────────────────────────────────────────────────────────┘
+Proceed? [yes / no]
+```
+
+If the user says **no** → print "Nothing changed." and stop. Do not proceed.
+
+---
+
+### Step 3 — Archive Prior Run
+
+If `{prior-slug}` exists and there are any non-empty files:
+
+1. Create `archive/{prior-slug}/{YYYY-MM-DD}/`. If that path already exists (same-day re-run), append `-2`, `-3`, etc.
+2. **Copy** (never move) into the archive:
+   - `configs/team-chat.md`
+   - `configs/task-board.md`
+   - `configs/playable-spec.md` and/or `configs/playable-spec.json`
+   - `configs/project-context.md`
+   - `docs/design/` → `archive/.../docs/design/`
+   - `docs/qa/` → `archive/.../docs/qa/`
+3. Report each file copied. Skip silently if a file is absent.
+
+---
+
+### Step 4 — Reset Workspace
+
+Execute in this order:
+
+**4a. team-chat.md** — write the canonical system header:
+```
+# Team Chat — cocos-agent-team
+
+Format: `> [YYYY-MM-DD HH:MM] [role] message`
+
+Mentions: `@design` `@cocos-engineer` `@typescript-dev` `@qa-tester`
+
+---
+
+> [SYSTEM] cocos-playable team initialized
+> [SYSTEM] Edit configs/project-context.md and configs/playable-spec.{md,json} before launch
+> [SYSTEM] 4 roles: 🎨 design  🛠 cocos-engineer  💻 typescript-dev  ✅ qa-tester
+```
+
+**4b. task-board.md** — read `configs/task-board.default.md`, substitute `{{slug}}` → `{new-slug}`, write to `configs/task-board.md`. If `task-board.default.md` is missing, write the minimal blank-sections template.
+
+**4c. playable-spec.md** — always write `configs/spec-template.md` to `configs/playable-spec.md` (the prior spec is archived; the new project needs a fresh one). If the user says they already have a spec ready, skip this step and tell them to drop the file at `configs/playable-spec.md` manually.
+
+**4d. project-context.md** — read `configs/project-context-template.md`, substitute:
+- `{{slug}}` → `{new-slug}`
+- `{{title}}` → working title
+- `{{platform}}` → platform choice
+- `{{orientation}}` → orientation
+- `{{bundle_mb}}` → bundle budget
+- `{{fps_avg}}` / `{{fps_min}}` → perf floor
+
+Write result to `configs/project-context.md`. If the template is missing, write a minimal stub with `TODO` markers.
+
+**4e. docs/** — delete and recreate `docs/design/` and `docs/qa/` as empty directories.
+
+---
+
+### Step 5 — Confirm and Print Next Steps
+
+```
+Workspace ready for `{new-slug}`.
+
+Prior run archived → archive/{prior-slug}/{YYYY-MM-DD}/   (if applicable)
+
+Next:
+  1. Fill in configs/playable-spec.md  (storyboard, acceptance criteria)
+  2. Fill in configs/project-context.md  (brand colors, app store URL)
+  3. Drop raw assets → PROJECT_DIR/assets/raw/
+  4. Run /cocos-agent-team  to launch the pipeline
+```
+
+---
+
+### Safety Rules for /new
+
+| Rule | Rationale |
+|------|-----------|
+| Archive BEFORE reset | Prior run is recoverable from `archive/` at any time |
+| Single confirmation | User sees the full manifest before a single byte changes |
+| Never touch `mcp-servers.json` | MCP wiring is environment-specific; resetting breaks all agents |
+| Never touch `skills/` | Skills are shared across all playables in this repo |
+| Never touch `agentmemory` | Keys are slug-namespaced; old keys don't pollute the new run |
+| Never wipe `build/` | Build outputs may be needed for comparison; user cleans manually |
 
 ---
 
@@ -348,8 +481,8 @@ Format:
 
 ## Reference Files
 
-- `README.md` — team overview and directory layout
-- `configs/spec-template.md` — playable spec template
-- `configs/spec-schema.json` — JSON spec schema
-- `configs/task-board.md` — live task state
-- `configs/team-chat.md` — inter-agent communication log
+- `cocos-agent-team/README.md` — team overview and directory layout
+- `cocos-agent-team/configs/spec-template.md` — playable spec template
+- `cocos-agent-team/configs/spec-schema.json` — JSON spec schema
+- `cocos-agent-team/configs/task-board.md` — live task state
+- `cocos-agent-team/configs/team-chat.md` — inter-agent communication log
