@@ -144,8 +144,22 @@ For each QA task:
 | `design` | Missing acceptance criteria, ambiguous wireframes, screens that "work" but feel wrong | Per bug |
 | `user` (no agent) | Release sign-off — only after PASS verdict | At milestone close |
 
+## Code Quality Audit (TheOne Standards)
+
+During the **Behaviour pass**, also run a code quality audit using `skills/theone-cocos-standards/SKILL.md`:
+
+- Use `references/review/quality-review.md` — check access modifiers, exceptions, `any` types, `console.log` leaks
+- Use `references/review/architecture-review.md` — verify lifecycle order, event cleanup in `onDisable`/`onDestroy`, required-ref validation in `onLoad`
+- Use `references/review/performance-review.md` — DrawCall count (`<10` target), allocations in `update()`, atlas usage
+
+File code-quality findings as `#qa-bug` tasks assigned to `@typescript-dev` with severity from the standards:
+- 🔴 Critical → must fix before PASS
+- 🟡 Important → conditional pass allowed if no gameplay impact
+- 🟢 Nice-to-have → note in report, not a blocker
+
 ## Reference Files
 
 - `references/perf-checklist.md` — FPS / memory / draw call / bundle thresholds per platform
 - `references/playable-policy.md` — Google Web Ad / Meta / AppLovin / IronSource / Unity creative policy checks
 - `references/bug-templates.md` — structured bug report templates per role
+- `../theone-cocos-standards/SKILL.md` — TheOne Studio standards: quality, architecture & perf review checklists

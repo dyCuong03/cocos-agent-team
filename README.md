@@ -19,6 +19,21 @@ Each role has:
 - A thin **autonomous loop prompt** in `prompts/<role>-system.md` that the bash launcher uses
 - A bash launcher in `agents/roles/<role>.sh`
 
+### Shared Standards
+
+All roles are trained on **TheOne Studio Cocos Creator Development Standards** (`skills/theone-cocos-standards/`), which enforce:
+
+| Priority | Area | Key Rules |
+|----------|------|-----------|
+| 🔴 1 | Code Quality | strict mode, access modifiers, throw exceptions, no `any`, no `console.log` in production |
+| 🟡 2 | Modern TypeScript | array methods, `?.` / `??`, destructuring, type guards |
+| 🟢 3 | Cocos Architecture | lifecycle order, event cleanup, `@property` validation |
+| 🔵 4 | Playable Performance | `<10` DrawCalls, sprite atlas, zero allocs in `update()`, `<5 MB` bundle |
+
+- `typescript-dev` applies these standards to every component written
+- `qa-tester` runs the quality/architecture/performance review checklists during QA passes
+- `cocos-engineer` references the size and DrawCall optimization guides during build
+
 ---
 
 ## MCP Servers

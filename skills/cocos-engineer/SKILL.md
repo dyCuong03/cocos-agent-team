@@ -134,3 +134,5 @@ For each engineering task:
 - `references/cocos-3.8-conventions.md` — scene file conventions, anchor systems, common component property names
 - `references/mcp-tool-recipes.md` — copy-paste tool-call sequences for common operations (create-button-with-tap-anim, build-prefab-from-selection, batch-import-spritesheet)
 - `references/build-and-bundle.md` — `cocos build` recipes, WebGL flags, bundle-size triage
+- `../theone-cocos-standards/references/framework/size-optimization.md` — bundle size targets, texture compression, atlas configuration
+- `../theone-cocos-standards/references/framework/playable-optimization.md` — DrawCall batching (`<10` target), GPU skinning, sprite atlas setup

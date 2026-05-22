@@ -130,8 +130,22 @@ Keep comments tight — the header is for the engineer, not narration of the cod
 | `qa-tester` | The state diagram + acceptance criteria for the mechanic | After a feature mechanic lands |
 | `design` | "The interaction contract for screen X is ambiguous — clarify Y" | Whenever the wireframe under-specifies |
 
+## TheOne Studio Coding Standards
+
+**Mandatory — apply to every component you write:**
+
+Every `.ts` file must comply with the TheOne Studio standards loaded in `skills/theone-cocos-standards/SKILL.md`. The priority order is:
+
+1. **Code Quality** (`references/language/quality-hygiene.md`) — strict mode, access modifiers, throw exceptions, no silent failures, no `any`, remove `console.log` before handoff
+2. **Modern TypeScript** (`references/language/modern-typescript.md`) — array methods, optional chaining `?.`, nullish coalescing `??`, destructuring
+3. **Cocos Architecture** (`references/framework/component-system.md`, `references/framework/event-patterns.md`) — lifecycle order, event cleanup in `onDisable`/`onDestroy`
+4. **Playable Performance** (`references/framework/playable-optimization.md`, `references/language/performance.md`) — zero allocations in `update()`, reuse vectors, throttle expensive ops
+
+Run the Quick Validation checklist from `skills/theone-cocos-standards/SKILL.md` before every hand-off to `@cocos-engineer`.
+
 ## Reference Files
 
 - `references/cocos-3.8-typescript-patterns.md` — `@property` types, lifecycle ordering, event system, tween chains, audio pooling
 - `references/playable-snippets.md` — battle-tested snippets: swipe detector, tap-with-juice, 3-state button, end-card reveal, CTA-with-fallback
 - `references/state-machine-template.md` — copy-paste FSM scaffold for medium-complexity mechanics
+- `../theone-cocos-standards/SKILL.md` — TheOne Studio code quality + Cocos architecture + perf standards (mandatory)
